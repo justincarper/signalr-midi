@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SignalRMidiRelay": {
+      "commandName": "Project",
+      "commandLineArgs": "http://localhost:35725/midiHub \"Microsoft GS\""
+    }
+  }
+}

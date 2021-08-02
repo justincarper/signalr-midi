@@ -1,0 +1,2 @@
+﻿--Start from cmd with kestrel so it's publicly available
+dotnet run --urls http://0.0.0.0:5000

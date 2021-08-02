@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Text;
 
-namespace SignalRPiano.Models
+namespace SharedModels
 {
     public class MIDIMessage
     {
         public string Note { get; set; }
         public int Velocity { get; set; }
     }
+
 }

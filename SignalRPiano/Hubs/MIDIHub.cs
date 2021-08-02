@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using SignalRPiano.Models;
+using SharedModels;
 using System.Threading.Tasks;
 
 namespace SignalRPiano.Hubs
