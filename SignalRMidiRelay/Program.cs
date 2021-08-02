@@ -2,6 +2,7 @@
 using NAudio.Midi;
 using SharedModels;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SignalRMidiRelay
@@ -20,25 +21,29 @@ namespace SignalRMidiRelay
             }
 
             //midi output device setup
+            ConsoleLog("MIDI Devices...",true);
             for (int device = 0; device < MidiOut.NumberOfDevices; device++)
             {
-                ConsoleLog(MidiOut.DeviceInfo(device).ProductName, true);
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine(MidiOut.DeviceInfo(device).ProductName);
                 if (MidiOut.DeviceInfo(device).ProductName.ToUpper().Contains(args[1].ToUpper()))
                 {
                     selectedMIDIDevice = device;
                 }
             }
+            Console.ResetColor();
             if (selectedMIDIDevice < 0)
             {
                 ConsoleError($"Could not find a MIDI device matching '{args[1]}'", true);
                 return;
             }
-            midiOut = new MidiOut(selectedMIDIDevice);
-            //int channel = 1;
-            //int noteNumber = int.Parse("50");
-            //var noteOnEvent = new NoteOnEvent(0, channel, noteNumber, 100, 50);
-            //mOut.Send(noteOnEvent.GetAsShortMessage());
+            else
+            {
+                ConsoleLog($"'{MidiOut.DeviceInfo(selectedMIDIDevice).ProductName}' device selected.", true);
+            }
 
+
+            midiOut = new MidiOut(selectedMIDIDevice);
 
             HubConnection hubConnection;
 
@@ -48,13 +53,14 @@ namespace SignalRMidiRelay
             {
                 hubConnection = new HubConnectionBuilder().WithUrl(args[0]).Build();
 
-                hubConnection.On<MIDIMessage>("ReceiveMessage", (message) =>
+                hubConnection.On<MIDIMessage>("ReceiveMessage", async (message) =>
                 {
                     Console.WriteLine($"{message.Note}: {message.Velocity}");
                     int channel = 1;
                     int noteNumber = int.Parse(message.Note);
-                    var noteOnEvent = new NoteOnEvent(0, channel, noteNumber, 100, 50);
-                    midiOut.Send(noteOnEvent.GetAsShortMessage());
+                    //noteNumber += 36;
+                    Thread t = new Thread(() => PlayMidiNote(midiOut, noteNumber, 90, channel));
+                    t.Start();
                 });
 
                 await hubConnection.StartAsync();
@@ -75,6 +81,14 @@ namespace SignalRMidiRelay
                 System.Threading.Thread.Sleep(1);
             }
         }
+
+        public async static void PlayMidiNote(MidiOut midiOut, int notenum, int velocity, int channel)
+        {
+            midiOut.Send(MidiMessage.StartNote(notenum, velocity, channel).RawData);
+            await Task.Delay(250).ConfigureAwait(false);
+            midiOut.Send(MidiMessage.StopNote(notenum, velocity, channel).RawData); 
+        }
+
 
         private static void MidiIn_MessageReceived(object sender, MidiInMessageEventArgs e)
         {
