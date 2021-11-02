@@ -2,7 +2,7 @@
   "profiles": {
     "SignalRMidiRelay": {
       "commandName": "Project",
-      "commandLineArgs": "http://localhost:35725/midiHub \"M50\""
+      "commandLineArgs": "http://192.168.1.26:5000/midiHub \"M50\""
     }
   }
 }

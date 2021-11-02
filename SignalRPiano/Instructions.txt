@@ -1,5 +1,8 @@
-﻿--Start from cmd with kestrel so it's publicly available
+﻿cd SignalRPiano
+--Start from cmd with kestrel so it's publicly available
 dotnet run --urls http://0.0.0.0:5000
+dotnet run --urls http://{{current IP}}:5000
+
 
 --start midi relay exe
 SignalRMidiRelay.exe http://192.168.1.26:5000/midiHub M50
